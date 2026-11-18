@@ -1,0 +1,23 @@
+$kind: http-request
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{userUsername}}",
+      "password": "{{userPassword}}"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Login USER exitoso', function () { pm.response.to.have.status(200); });
+      const json = pm.response.json();
+      pm.expect(json.role).to.eql('USER');
+      pm.collectionVariables.set('userToken', json.token);
+    language: text/javascript
+order: 2000

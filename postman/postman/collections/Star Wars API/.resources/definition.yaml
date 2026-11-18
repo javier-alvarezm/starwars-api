@@ -1,0 +1,18 @@
+$kind: collection
+description: Colección completa para evaluar la API Star Wars. Ejecute primero Authentication / Register USER y luego los logins. El login ADMIN guarda automáticamente {{token}}, utilizado por sincronización, consultas y estadísticas.
+variables:
+  baseUrl: http://localhost:8080
+  adminUsername: admin
+  adminPassword: ChangeMe123!
+  userUsername: evaluation_user
+  userPassword: Evaluation123!
+  token: ""
+  userToken: ""
+  characterId: "1"
+  filmId: "1"
+auth:
+  - id: caee0579-8e6a-4c97-92c4-0fbcee95228f
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{token}}"

@@ -1,0 +1,28 @@
+spring:
+  application.name: starwars-api
+  datasource:
+    url: jdbc:h2:file:./data/starwars;AUTO_SERVER=TRUE
+    username: sa
+    password: ""
+  jpa:
+    hibernate.ddl-auto: update
+    open-in-view: false
+  h2.console.enabled: true
+
+server.error.include-message: always
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:change-this-development-secret-with-at-least-32-characters}
+    expiration: ${JWT_EXPIRATION:3600}
+  swapi:
+    base-url: ${SWAPI_BASE_URL:https://swapi.dev/api}
+    timeout-seconds: ${SWAPI_TIMEOUT_SECONDS:15}
+  bootstrap-admin:
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:ChangeMe123!}
+
+springdoc:
+  swagger-ui.path: /swagger-ui.html
+
+management.endpoints.web.exposure.include: health,info

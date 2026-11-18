@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{baseUrl}}/api/films?title=&page=0&size=20&sort=episodeId,asc"
+method: GET
+queryParams:
+  title: ""
+  page: "0"
+  size: "20"
+  sort: episodeId,asc
+order: 1000

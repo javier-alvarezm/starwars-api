@@ -1,0 +1,3 @@
+package cl.javier.starwars.config;
+import cl.javier.starwars.service.QueryAuditInterceptor; import org.springframework.context.annotation.Configuration; import org.springframework.data.web.config.EnableSpringDataWebSupport; import org.springframework.web.servlet.config.annotation.*;
+@Configuration @EnableSpringDataWebSupport(pageSerializationMode=EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO) public class WebConfig implements WebMvcConfigurer{private final QueryAuditInterceptor audit;public WebConfig(QueryAuditInterceptor audit){this.audit=audit;}public void addInterceptors(InterceptorRegistry r){r.addInterceptor(audit).addPathPatterns("/api/characters/**","/api/films/**");}}

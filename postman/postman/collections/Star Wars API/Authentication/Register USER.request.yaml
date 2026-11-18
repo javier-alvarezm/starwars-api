@@ -1,0 +1,27 @@
+$kind: http-request
+description: Registra un usuario con rol USER. Si ya existe, continúe con Login USER.
+url: "{{baseUrl}}/api/auth/register"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{userUsername}}",
+      "password": "{{userPassword}}"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Registro creado o usuario ya existente', function () {
+        pm.expect([201, 400]).to.include(pm.response.code);
+      });
+      if (pm.response.code === 201) {
+        const json = pm.response.json();
+        pm.collectionVariables.set('userToken', json.token);
+      }
+    language: text/javascript
+order: 1000

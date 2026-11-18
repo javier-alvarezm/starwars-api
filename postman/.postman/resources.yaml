@@ -1,0 +1,11 @@
+# Use this workspace to collaborate
+workspace:
+  id: 4b4263ee-84a1-4e9e-8480-365a217d05a8
+
+localResources:
+  collections:
+    - ../Star Wars API
+
+cloudResources:
+  collections:
+    ../postman/collections/Star Wars API: 8fa1238b-6e83-4f19-9f7f-cfd33c4d1daf

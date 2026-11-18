@@ -1,0 +1,22 @@
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: starwars
+      POSTGRES_USER: starwars
+      POSTGRES_PASSWORD: starwars
+    ports: ["5432:5432"]
+    volumes: ["postgres-data:/var/lib/postgresql/data"]
+  api:
+    build: .
+    depends_on: [db]
+    environment:
+      SPRING_PROFILES_ACTIVE: postgres
+      DB_URL: jdbc:postgresql://db:5432/starwars
+      DB_USERNAME: starwars
+      DB_PASSWORD: starwars
+      JWT_SECRET: change-this-secret-before-production-at-least-32-chars
+      ADMIN_PASSWORD: ChangeMe123!
+    ports: ["8080:8080"]
+volumes:
+  postgres-data:

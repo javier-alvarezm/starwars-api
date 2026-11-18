@@ -1,0 +1,12 @@
+$kind: http-request
+url: "{{baseUrl}}/api/admin/sync"
+method: POST
+auth:
+  type: bearer
+  credentials:
+    token: "{{userToken}}"
+scripts:
+  - type: afterResponse
+    code: pm.test('USER sin permisos responde 403', function () { pm.response.to.have.status(403); });
+    language: text/javascript
+order: 2000

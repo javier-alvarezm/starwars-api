@@ -1,0 +1,12 @@
+$kind: http-request
+description: Recorre todas las páginas de people y persiste personajes, películas, vehículos y naves. Puede tardar según SWAPI.
+url: "{{baseUrl}}/api/admin/sync"
+method: POST
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Sincronización exitosa', function () { pm.response.to.have.status(200); });
+      const json = pm.response.json();
+      pm.expect(json.characters).to.be.a('number');
+    language: text/javascript
+order: 1000

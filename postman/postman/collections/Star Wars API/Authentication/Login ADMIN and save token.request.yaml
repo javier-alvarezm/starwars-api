@@ -1,0 +1,25 @@
+$kind: http-request
+description: Guarda el JWT ADMIN en la variable de colección token.
+url: "{{baseUrl}}/api/auth/login"
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: |-
+    {
+      "username": "{{adminUsername}}",
+      "password": "{{adminPassword}}"
+    }
+auth:
+  type: noauth
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Login ADMIN exitoso', function () { pm.response.to.have.status(200); });
+      const json = pm.response.json();
+      pm.expect(json.role).to.eql('ADMIN');
+      pm.expect(json.token).to.be.a('string').and.not.empty;
+      pm.collectionVariables.set('token', json.token);
+    language: text/javascript
+order: 3000

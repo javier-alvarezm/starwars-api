@@ -1,0 +1,9 @@
+$kind: http-request
+url: "{{baseUrl}}/api/characters?name=&page=0&size=20&sort=name,asc"
+method: GET
+queryParams:
+  name: ""
+  page: "0"
+  size: "20"
+  sort: name,asc
+order: 1000

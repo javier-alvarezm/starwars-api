@@ -1,0 +1,258 @@
+{
+  "info": {
+    "_postman_id": "a8bb3c75-e98d-46ab-81ea-f356da9cbbf8",
+    "name": "Star Wars API",
+    "description": "Colección completa para evaluar la API Star Wars. Ejecute primero Authentication / Register USER y luego los logins. El login ADMIN guarda automáticamente {{token}}, utilizado por sincronización, consultas y estadísticas.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080", "type": "string" },
+    { "key": "adminUsername", "value": "admin", "type": "string" },
+    { "key": "adminPassword", "value": "ChangeMe123!", "type": "string" },
+    { "key": "userUsername", "value": "evaluation_user", "type": "string" },
+    { "key": "userPassword", "value": "Evaluation123!", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "userToken", "value": "", "type": "string" },
+    { "key": "characterId", "value": "1", "type": "string" },
+    { "key": "filmId", "value": "1", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register USER",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{userUsername}}\",\n  \"password\": \"{{userPassword}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/register",
+            "description": "Registra un usuario con rol USER. Si ya existe, continúe con Login USER."
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Registro creado o usuario ya existente', function () {",
+                "  pm.expect([201, 400]).to.include(pm.response.code);",
+                "});",
+                "if (pm.response.code === 201) {",
+                "  const json = pm.response.json();",
+                "  pm.collectionVariables.set('userToken', json.token);",
+                "}"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login USER",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{userUsername}}\",\n  \"password\": \"{{userPassword}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/login"
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Login USER exitoso', function () { pm.response.to.have.status(200); });",
+                "const json = pm.response.json();",
+                "pm.expect(json.role).to.eql('USER');",
+                "pm.collectionVariables.set('userToken', json.token);"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Login ADMIN and save token",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"{{adminUsername}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": { "raw": { "language": "json" } }
+            },
+            "url": "{{baseUrl}}/api/auth/login",
+            "description": "Guarda el JWT ADMIN en la variable de colección token."
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Login ADMIN exitoso', function () { pm.response.to.have.status(200); });",
+                "const json = pm.response.json();",
+                "pm.expect(json.role).to.eql('ADMIN');",
+                "pm.expect(json.token).to.be.a('string').and.not.empty;",
+                "pm.collectionVariables.set('token', json.token);"
+              ]
+            }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "Administration",
+      "item": [
+        {
+          "name": "Synchronize SWAPI",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/admin/sync",
+            "description": "Recorre todas las páginas de people y persiste personajes, películas, vehículos y naves. Puede tardar según SWAPI."
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": [
+                "pm.test('Sincronización exitosa', function () { pm.response.to.have.status(200); });",
+                "const json = pm.response.json();",
+                "pm.expect(json.characters).to.be.a('number');"
+              ]
+            }
+          }]
+        },
+        {
+          "name": "Global statistics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/admin/statistics"
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": ["pm.test('Estadísticas disponibles', function () { pm.response.to.have.status(200); });"]
+            }
+          }]
+        }
+      ]
+    },
+    {
+      "name": "Characters",
+      "item": [
+        {
+          "name": "List characters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/characters?name=&page=0&size=20&sort=name,asc"
+          }
+        },
+        {
+          "name": "Character detail",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/characters/{{characterId}}" }
+        },
+        {
+          "name": "Character films",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/characters/{{characterId}}/films" }
+        },
+        {
+          "name": "Character vehicles",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/characters/{{characterId}}/vehicles" }
+        },
+        {
+          "name": "Character starships",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/characters/{{characterId}}/starships" }
+        }
+      ]
+    },
+    {
+      "name": "Films",
+      "item": [
+        {
+          "name": "List films",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/films?title=&page=0&size=20&sort=episodeId,asc"
+          }
+        },
+        {
+          "name": "Film detail",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/films/{{filmId}}" }
+        },
+        {
+          "name": "Film characters",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/films/{{filmId}}/characters" }
+        },
+        {
+          "name": "Film vehicles",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/films/{{filmId}}/vehicles" }
+        },
+        {
+          "name": "Film starships",
+          "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/api/films/{{filmId}}/starships" }
+        }
+      ]
+    },
+    {
+      "name": "Security checks",
+      "item": [
+        {
+          "name": "Protected endpoint without token returns 401",
+          "request": {
+            "auth": { "type": "noauth" },
+            "method": "GET",
+            "header": [],
+            "url": "{{baseUrl}}/api/characters"
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": ["pm.test('Sin token responde 401', function () { pm.response.to.have.status(401); });"]
+            }
+          }]
+        },
+        {
+          "name": "USER cannot synchronize returns 403",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [{ "key": "token", "value": "{{userToken}}", "type": "string" }]
+            },
+            "method": "POST",
+            "header": [],
+            "url": "{{baseUrl}}/api/admin/sync"
+          },
+          "event": [{
+            "listen": "test",
+            "script": {
+              "type": "text/javascript",
+              "exec": ["pm.test('USER sin permisos responde 403', function () { pm.response.to.have.status(403); });"]
+            }
+          }]
+        }
+      ]
+    }
+  ]
+}
